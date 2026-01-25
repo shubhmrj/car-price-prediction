@@ -1,0 +1,28 @@
+<html>
+<body>
+    <div class="login">
+       <h1>FWI Prediction</h1>
+   
+        <!-- Main Input For Receiving Query to our ML -->
+       <form action="{{ url_for('predict_datapoint')}}" method="post">
+           <input type="text" name="model" placeholder="model" required="required" /><br>
+           <input type="text" name="vehicle_age" placeholder="vehicle_age" required="required" /><br>
+           <input type="text" name="km_driven" placeholder="km_driven" required="required" /><br>
+           <input type="text" name="seller_type" placeholder="seller_type" required="required" /><br>
+           <input type="text" name="fuel_type" placeholder="fuel_type" required="required" /><br>
+           <input type="text" name="transmission_type" placeholder="transmission_type" required="required" /><br>
+           <input type="text" name="mileage" placeholder="mileage" required="required" /><br>
+           <input type="text" name="engine" placeholder="engine" required="required" /><br>
+            <input type="text" name="max_power" placeholder="max_power" required="required" /><br>
+           <input type="text" name="seats" placeholder="seats" required="required" /><br>
+           
+   'model', 'vehicle_age', 'km_driven', 'seller_type', 'fuel_type',
+       'transmission_type', 'mileage', 'engine', 'max_power', 'seats'
+   
+           <button type="submit" class="btn btn-primary btn-block btn-large">Predict</button>
+       </form>
+    <h2>
+       THE FWI prediction is {{results}}
+    </h2>
+   <body>
+</html>
