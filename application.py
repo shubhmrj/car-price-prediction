@@ -1,38 +1,53 @@
 import pickle
+import pandas as pd
 from flask import Flask, render_template, request
 
 application = Flask(__name__)
 app = application
 
-standard = pickle.load(open("Models/preprocessor.pkl","rb"))
-randomsearchcv = pickle.load(open("Models/randomsearchcv.pkl","rb"))
+preprocessor = pickle.load(open("Models/preprocessor.pkl", "rb"))
+model = pickle.load(open("Models/randomsearchcv.pkl", "rb"))
 
-@app.route('/')
+@app.route("/")
 def index():
-    return render_template('home.html')
+    return render_template("home.html")
 
-@app.route('/predictdata',methods=['GET','POST'])
+@app.route("/predictdata", methods=["GET", "POST"])
 def predict_datapoint():
-    if request.method=="POST":
-        model=float(request.form.get('model'))
-        vehicle_age = float(request.form.get('vehicle_age'))
-        km_driven = float(request.form.get('km_driven'))
-        seller_type = float(request.form.get('seller_type'))
-        fuel_type = float(request.form.get('fuel_type'))
-        transmission_type = float(request.form.get('transmission_type'))
-        mileage = float(request.form.get('mileage'))
-        engine = float(request.form.get('engine'))
-        max_power = float(request.form.get('max_power'))
-        seats = float(request.form.get('seats'))
+    if request.method == "POST":
 
-        new_data_scaled=standard.transform([[model,vehicle_age,km_driven,seller_type,fuel_type,transmission_type,mileage,engine,max_power,seats]])
-        result=randomsearchcv.predict(new_data_scaled)
+        model_name = request.form.get("model")
+        seller_type = request.form.get("seller_type")
+        fuel_type = request.form.get("fuel_type")
+        transmission_type = request.form.get("transmission_type")
 
-        return render_template('home.html',results=result[0])
+        vehicle_age = float(request.form.get("vehicle_age"))
+        km_driven = float(request.form.get("km_driven"))
+        mileage = float(request.form.get("mileage"))
+        engine = float(request.form.get("engine"))
+        max_power = float(request.form.get("max_power"))
+        seats = float(request.form.get("seats"))
 
-       
-    else:
-        return render_template('home.html')
+        input_df = pd.DataFrame({
+            "model": [model_name],
+            "vehicle_age": [vehicle_age],
+            "km_driven": [km_driven],
+            "seller_type": [seller_type],
+            "fuel_type": [fuel_type],
+            "transmission_type": [transmission_type],
+            "mileage": [mileage],
+            "engine": [engine],
+            "max_power": [max_power],
+            "seats": [seats]
+        })
 
-if __name__=="__main__":
-    app.run(host="0.0.0.0")
+        transformed_data = preprocessor.transform(input_df)
+        prediction = model.predict(transformed_data)
+
+        return render_template("home.html", results=f"₹ {round(prediction[0], 2)}")
+
+    return render_template("home.html")
+
+
+if __name__ == "__main__":
+    app.run()
