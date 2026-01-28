@@ -1,54 +1,290 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Car Price Prediction</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Car Price Estimator</title>
+
+<!-- Single clean font -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --bg:#f5f6f4;
+  --card:#ffffff;
+  --text:#1f2933;
+  --muted:#6b7280;
+  --accent:#b91c1c; /* car red */
+  --border:#e5e7eb;
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family:'Manrope',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  padding:20px;
+  position:relative;
+}
+
+/* Subtle car background */
+body::after{
+  content:"";
+  position:fixed;
+  inset:0;
+  background:url("https://images.unsplash.com/photo-1542362567-b07e54358753?q=80&w=1600&auto=format&fit=crop");
+  background-size:cover;
+  background-position:right center;
+  opacity:0.08;
+  pointer-events:none;
+}
+
+.wrapper{
+  max-width:880px;
+  margin:auto;
+  position:relative;
+  z-index:1;
+}
+
+.header{
+  margin-bottom:26px;
+}
+
+.header h1{
+  margin:0;
+  font-size:1.9rem;
+  font-weight:600;
+}
+
+.header p{
+  margin-top:6px;
+  color:var(--muted);
+  max-width:560px;
+}
+
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:30px;
+  box-shadow:0 25px 50px rgba(0,0,0,.1);
+}
+
+.section{
+  margin-bottom:28px;
+}
+
+.section-title{
+  font-size:.8rem;
+  font-weight:600;
+  letter-spacing:.08em;
+  color:var(--muted);
+  margin-bottom:14px;
+}
+
+.fields{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:16px;
+}
+
+label{
+  display:block;
+  font-size:.75rem;
+  color:var(--muted);
+  margin-bottom:5px;
+}
+
+input,select{
+  width:100%;
+  padding:13px 14px;
+  font-size:.95rem;
+  border-radius:12px;
+  border:1px solid var(--border);
+  background:#fff;
+  transition:border .15s ease, box-shadow .15s ease;
+}
+
+input:focus,select:focus{
+  outline:none;
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px rgba(185,28,28,.12);
+}
+
+.actions{
+  display:flex;
+  gap:14px;
+  flex-wrap:wrap;
+  margin-top:10px;
+}
+
+button{
+  padding:14px 20px;
+  border-radius:14px;
+  border:none;
+  font-weight:600;
+  cursor:pointer;
+  transition:transform .12s ease, box-shadow .12s ease;
+}
+
+button:active{
+  transform:scale(.97);
+}
+
+.btn-primary{
+  background:var(--accent);
+  color:#fff;
+  box-shadow:0 12px 25px rgba(185,28,28,.35);
+}
+
+.btn-secondary{
+  background:#f3f4f6;
+  color:#111827;
+}
+
+/* Result animation */
+.result{
+  margin-top:28px;
+  padding:24px;
+  border-radius:16px;
+  border:1px solid var(--border);
+  background:#fafafa;
+  opacity:0;
+  transform:translateY(14px);
+  animation:reveal .5s ease forwards;
+}
+
+.result small{
+  color:var(--muted);
+}
+
+.result strong{
+  display:block;
+  margin-top:6px;
+  font-size:2.3rem;
+  font-weight:600;
+  letter-spacing:-.02em;
+}
+
+@keyframes reveal{
+  to{opacity:1;transform:none}
+}
+
+/* Mobile polish */
+@media(max-width:520px){
+  .card{padding:24px}
+  .header h1{font-size:1.6rem}
+}
+</style>
 </head>
 
 <body>
-<div class="login">
-    <h1>Car Price Prediction</h1>
+<div class="wrapper">
 
-    <form action="{{ url_for('predict_datapoint') }}" method="post">
+  <div class="header">
+    <h1>Car Price Estimator</h1>
+    <p>Estimate your car’s resale value based on real usage, condition, and market patterns.</p>
+  </div>
 
-        <!-- CATEGORICAL -->
-        <input type="text" name="model" placeholder="Car Model" required><br>
+  <div class="card">
+    <form action="{{ url_for('predict_datapoint') }}" method="post" id="carForm">
 
-        <select name="seller_type" required>
-            <option value="">Seller Type</option>
-            <option value="Individual">Individual</option>
-            <option value="Dealer">Dealer</option>
-            <option value="Trustmark Dealer">Trustmark Dealer</option>
-        </select><br>
+      <!-- Vehicle details -->
+      <div class="section">
+        <div class="section-title">VEHICLE DETAILS</div>
+        <div class="fields">
+          <div>
+            <label>Model Code (encoded)</label>
+            <input type="number" name="model" placeholder="e.g. 118" required>
+          </div>
+        </div>
+      </div>
 
-        <select name="fuel_type" required>
-            <option value="">Fuel Type</option>
-            <option value="Petrol">Petrol</option>
-            <option value="Diesel">Diesel</option>
-            <option value="CNG">CNG</option>
-            <option value="LPG">LPG</option>
-            <option value="Electric">Electric</option>
-        </select><br>
+      <!-- Ownership -->
+      <div class="section">
+        <div class="section-title">OWNERSHIP & SPECIFICATIONS</div>
+        <div class="fields">
+          <div>
+            <label>Seller Type</label>
+            <select name="seller_type" required>
+              <option value="">Select</option>
+              <option>Individual</option>
+              <option>Dealer</option>
+              <option>Trustmark Dealer</option>
+            </select>
+          </div>
 
-        <select name="transmission_type" required>
-            <option value="">Transmission</option>
-            <option value="Manual">Manual</option>
-            <option value="Automatic">Automatic</option>
-        </select><br>
+          <div>
+            <label>Fuel Type</label>
+            <select name="fuel_type" required>
+              <option value="">Select</option>
+              <option>Petrol</option>
+              <option>Diesel</option>
+              <option>CNG</option>
+              <option>LPG</option>
+              <option>Electric</option>
+            </select>
+          </div>
 
-        <!-- NUMERICAL -->
-        <input type="number" name="vehicle_age" placeholder="Vehicle Age (years)" step="1" required><br>
-        <input type="number" name="km_driven" placeholder="KM Driven" step="1" required><br>
-        <input type="number" name="mileage" placeholder="Mileage (km/l)" step="0.1" required><br>
-        <input type="number" name="engine" placeholder="Engine (CC)" step="1" required><br>
-        <input type="number" name="max_power" placeholder="Max Power (bhp)" step="0.1" required><br>
-        <input type="number" name="seats" placeholder="Seats" step="1" required><br>
+          <div>
+            <label>Transmission</label>
+            <select name="transmission_type" required>
+              <option value="">Select</option>
+              <option>Manual</option>
+              <option>Automatic</option>
+            </select>
+          </div>
+        </div>
+      </div>
 
-        <button type="submit">Predict Price</button>
+      <!-- Condition -->
+      <div class="section">
+        <div class="section-title">USAGE & CONDITION</div>
+        <div class="fields">
+          <div><label>Vehicle Age (years)</label><input type="number" name="vehicle_age" required></div>
+          <div><label>Kilometers Driven</label><input type="number" name="km_driven" required></div>
+          <div><label>Mileage (km/l)</label><input type="number" step="0.1" name="mileage" required></div>
+          <div><label>Engine (CC)</label><input type="number" name="engine" required></div>
+          <div><label>Max Power (bhp)</label><input type="number" step="0.1" name="max_power" required></div>
+          <div><label>Seats</label><input type="number" name="seats" required></div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="btn-secondary" onclick="fillSample()">Use sample data</button>
+        <button type="submit" class="btn-primary">Estimate price</button>
+      </div>
     </form>
 
     {% if results %}
-        <h2>Predicted Car Price: ₹ {{ results }}</h2>
+    <div class="result">
+      <small>Estimated resale value</small>
+      <strong>{{ results }}</strong>
+    </div>
     {% endif %}
+  </div>
+
 </div>
+
+<script>
+function fillSample(){
+  const f=document.forms.carForm;
+  f.model.value=118;
+  f.seller_type.value="Individual";
+  f.fuel_type.value="Petrol";
+  f.transmission_type.value="Manual";
+  f.vehicle_age.value=5;
+  f.km_driven.value=45000;
+  f.mileage.value=20.4;
+  f.engine.value=1197;
+  f.max_power.value=82;
+  f.seats.value=5;
+}
+</script>
 </body>
 </html>
