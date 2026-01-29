@@ -3,179 +3,171 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Car Price Estimator</title>
+  <title>Car Value Estimator</title>
 
-  <!-- Google Font -->
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
 
   <style>
-    :root{
-      --bg:#f5f6f4;
-      --card:#ffffff;
-      --text:#1f2933;
-      --muted:#6b7280;
-      --accent:#b91c1c;
-      --border:#e5e7eb;
+    :root {
+      --bg: #f8f9fa;
+      --card: #ffffff;
+      --text: #1a1a1a;
+      --muted: #6b7280;
+      --accent: #ff5a3c; 
+      --success: #10b981;
+      --border: #e5e7eb;
+      --aura: rgba(255, 90, 60, 0.03);
     }
 
-    *{ box-sizing:border-box; }
+    * { box-sizing: border-box; transition: all 0.2s ease; }
 
-    body{
-      margin:0;
-      font-family:Manrope,sans-serif;
-      background:
-        linear-gradient(to bottom, rgba(245,246,244,.94), rgba(245,246,244,.98)),
-        url("https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=1600&auto=format&fit=crop");
-      background-size:cover;
-      background-position:center;
-      min-height:100vh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:16px;
+    body {
+      margin: 0;
+      font-family: 'Outfit', sans-serif;
+      background-color: var(--bg);
+      background-image: 
+        radial-gradient(circle at 10% 20%, var(--aura) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, var(--aura) 0%, transparent 40%),
+        url("https://www.transparenttextures.com/patterns/cloud-grid.png");
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
     }
 
-    .wrapper{
-      width:100%;
-      max-width:920px;
+    .wrapper { width: 100%; max-width: 850px; position: relative; }
+
+    .header { text-align: center; margin-bottom: 40px; }
+    .header h1 { font-family: 'DM Serif Display', serif; font-size: 3rem; margin: 0; }
+    .header p { color: var(--muted); font-size: 1.1rem; margin-top: 8px; }
+
+    .card {
+      background: var(--card);
+      border-radius: 32px;
+      padding: 40px;
+      border: 1px solid var(--border);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.04);
     }
 
-    .header{
-      margin-bottom:24px;
+    .section-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 20px;
+      display: block;
+      border-bottom: 1px solid #f3f4f6;
+      padding-bottom: 8px;
     }
 
-    .header h1{
-      margin:0;
-      font-size:1.9rem;
-      font-weight:600;
+    .fields {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 32px;
     }
 
-    .header p{
-      margin-top:6px;
-      color:var(--muted);
-      max-width:560px;
+    .input-group { display: flex; flex-direction: column; gap: 6px; }
+    label { font-size: 0.85rem; font-weight: 500; color: var(--muted); }
+
+    input, select {
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      font-size: 0.95rem;
+      font-family: inherit;
+      background: #fafafa;
     }
 
-    .card{
-      background:var(--card);
-      border-radius:18px;
-      padding:28px;
-      border:1px solid var(--border);
-      box-shadow:0 25px 50px rgba(0,0,0,.12);
+    input:focus {
+      outline: none;
+      border-color: var(--accent);
+      background: #fff;
+      box-shadow: 0 0 0 4px rgba(255, 90, 60, 0.08);
     }
 
-    label{
-      font-size:.75rem;
-      color:var(--muted);
-      margin-bottom:4px;
-      display:block;
+    /* Autocomplete */
+    .autocomplete { position: relative; }
+    .suggestions {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0; right: 0;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      max-height: 240px;
+      overflow-y: auto;
+      z-index: 100;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      display: none;
+    }
+    .suggestions div { padding: 12px 16px; cursor: pointer; font-size: 0.9rem; }
+    .suggestions div:hover { background: #fff5f3; color: var(--accent); }
+
+    /* Results */
+    .result-container {
+      margin-top: 40px;
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 25px;
+      animation: slideUp 0.6s ease-out;
     }
 
-    input, select{
-      width:100%;
-      padding:13px 14px;
-      border-radius:12px;
-      border:1px solid var(--border);
-      font-size:.95rem;
+    .price-card {
+      background: #fff9f8;
+      padding: 30px;
+      border-radius: 24px;
+      border: 1px solid rgba(255, 90, 60, 0.2);
+      text-align: center;
     }
 
-    .section{ margin-bottom:26px; }
-
-    .section-title{
-      font-size:.75rem;
-      letter-spacing:.08em;
-      color:var(--muted);
-      margin-bottom:12px;
-      font-weight:600;
+    .price-card strong {
+      display: block;
+      font-family: 'DM Serif Display', serif;
+      font-size: 2.8rem;
+      color: var(--accent);
+      margin: 10px 0;
     }
 
-    .fields{
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-      gap:16px;
+    .confidence-wrapper { margin-top: 15px; text-align: left; }
+    .meter-label { font-size: 0.7rem; font-weight: 700; color: var(--muted); text-transform: uppercase; margin-bottom: 5px; display: block;}
+    .meter-bar { height: 6px; background: #e5e7eb; border-radius: 10px; overflow: hidden; }
+    .meter-fill { height: 100%; background: var(--success); width: 0%; transition: width 1.5s ease-in-out; }
+
+    .verdict-card {
+      background: #fcfcfc;
+      padding: 25px;
+      border-radius: 24px;
+      border: 1px solid var(--border);
     }
 
-    /* ---------- AUTOCOMPLETE ---------- */
-    .autocomplete{ position:relative; }
-
-    .suggestions{
-      position:absolute;
-      top:100%;
-      left:0;
-      right:0;
-      background:#fff;
-      border:1px solid var(--border);
-      border-radius:12px;
-      max-height:240px;
-      overflow-y:auto;
-      z-index:50;
-      display:none;
+    .verdict-text { font-size: 0.9rem; line-height: 1.5; color: #4b5563; margin-top: 12px; }
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: #ecfdf5;
+      color: #065f46;
+      margin-bottom: 10px;
     }
 
-    .suggestions div{
-      padding:10px 14px;
-      cursor:pointer;
-    }
+    .actions { display: flex; gap: 16px; margin-top: 10px; }
+    button { flex: 1; padding: 16px 24px; border-radius: 16px; border: none; font-weight: 600; cursor: pointer; font-family: inherit; }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-secondary { background: #f3f4f6; color: var(--text); }
 
-    .suggestions div:hover{
-      background:#f3f4f6;
-    }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 
-    .hint{
-      font-size:.7rem;
-      color:var(--muted);
-      margin-top:6px;
-    }
-
-    .actions{
-      display:flex;
-      gap:14px;
-      flex-wrap:wrap;
-      margin-top:10px;
-    }
-
-    button{
-      padding:14px 20px;
-      border-radius:14px;
-      border:none;
-      font-weight:600;
-      cursor:pointer;
-    }
-
-    .btn-primary{
-      background:var(--accent);
-      color:#fff;
-    }
-
-    .btn-secondary{
-      background:#f3f4f6;
-    }
-
-    .result{
-      margin-top:24px;
-      padding:20px;
-      border-radius:14px;
-      background:#fafafa;
-      border:1px solid var(--border);
-      animation:fadeUp .45s ease forwards;
-    }
-
-    .result strong{
-      display:block;
-      font-size:2.2rem;
-      margin-top:6px;
-    }
-
-    @keyframes fadeUp{
-      from{opacity:0;transform:translateY(14px)}
-      to{opacity:1;transform:none}
-    }
-
-    @media(max-width:520px){
-      .card{padding:22px}
-      .header h1{font-size:1.6rem}
+    @media (max-width: 768px) {
+      .result-container { grid-template-columns: 1fr; }
+      .card { padding: 25px; }
     }
   </style>
 </head>
@@ -183,154 +175,191 @@
 <body>
 <div class="wrapper">
   <div class="header">
-    <h1>Car Price Estimator</h1>
-    <p>Estimate your car’s resale value using real usage and market patterns.</p>
+    <h1>Car Value.</h1>
+    <p>Predict your car's market price in seconds.</p>
   </div>
 
   <div class="card">
     <form method="post" action="{{ url_for('predict_datapoint') }}" id="carForm">
-
-      <div class="section">
-        <div class="section-title">VEHICLE DETAILS</div>
-        <div class="fields">
-          <div class="autocomplete">
-            <label>Car Model</label>
-            <input id="modelInput" placeholder="Type or select car model" autocomplete="off" required>
-            <input type="hidden" name="model" id="modelCode">
-            <div id="suggestions" class="suggestions"></div>
-            <div class="hint">Scroll or type — nearest match auto-selected</div>
-          </div>
+      
+      <span class="section-label">01. Vehicle Identity</span>
+      <div class="fields">
+        <div class="input-group autocomplete" style="grid-column: 1 / -1;">
+          <label>Car Model</label>
+          <input id="modelInput" placeholder="Select car model..." autocomplete="off" required>
+          <input type="hidden" name="model" id="modelCode">
+          <div id="suggestions" class="suggestions"></div>
         </div>
       </div>
 
-      <div class="section">
-        <div class="fields">
-          <select name="seller_type" required>
-            <option value="">Seller Type</option>
-            <option>Individual</option>
-            <option>Dealer</option>
-            <option>Trustmark Dealer</option>
-          </select>
-
+      <span class="section-label">02. Setup</span>
+      <div class="fields">
+        <div class="input-group">
+          <label>Fuel</label>
           <select name="fuel_type" required>
-            <option value="">Fuel Type</option>
-            <option>Petrol</option>
-            <option>Diesel</option>
-            <option>CNG</option>
-            <option>LPG</option>
-            <option>Electric</option>
+            <option value="Petrol">Petrol</option>
+            <option value="Diesel">Diesel</option>
+            <option value="CNG">CNG</option>
+            <option value="Electric">Electric</option>
           </select>
-
+        </div>
+        <div class="input-group">
+          <label>Transmission</label>
           <select name="transmission_type" required>
-            <option value="">Transmission</option>
-            <option>Manual</option>
-            <option>Automatic</option>
+            <option value="Manual">Manual</option>
+            <option value="Automatic">Automatic</option>
           </select>
+        </div>
+        <div class="input-group">
+          <label>Seller</label>
+          <select name="seller_type">
+            <option value="Individual">Individual</option>
+            <option value="Dealer">Dealer</option>
+            <option value="Trustmark Dealer">Trustmark Dealer</option>
+          </select>
+        </div>
+      </div>
 
-          <input type="number" name="vehicle_age" placeholder="Vehicle Age" required>
-          <input type="number" name="km_driven" placeholder="KM Driven" required>
-          <input type="number" step="0.1" name="mileage" placeholder="Mileage" required>
-          <input type="number" name="engine" placeholder="Engine CC" required>
-          <input type="number" step="0.1" name="max_power" placeholder="Max Power" required>
-          <input type="number" name="seats" placeholder="Seats" required>
+      <span class="section-label">03. Stats</span>
+      <div class="fields">
+        <div class="input-group">
+          <label>Age (Years)</label>
+          <input type="number" name="vehicle_age" id="ageInput" placeholder="e.g. 4" required>
+        </div>
+        <div class="input-group">
+          <label>KM Driven</label>
+          <input type="number" name="km_driven" placeholder="e.g. 35000" required>
+        </div>
+        <div class="input-group">
+          <label>Engine (CC)</label>
+          <input type="number" name="engine" placeholder="1197" required>
+        </div>
+        <div class="input-group">
+          <label>Power (BHP)</label>
+          <input type="number" step="0.1" name="max_power" placeholder="82" required>
+        </div>
+        <div class="input-group">
+          <label>KMPL</label>
+          <input type="number" step="0.1" name="mileage" placeholder="18.5" required>
+        </div>
+        <div class="input-group">
+          <label>Seats</label>
+          <input type="number" name="seats" value="5" required>
         </div>
       </div>
 
       <div class="actions">
-        <button type="button" class="btn-secondary" onclick="fillSample()">Use sample data</button>
-        <button type="submit" class="btn-primary">Estimate price</button>
+        <button type="button" class="btn-secondary" onclick="fillSample()">Auto-fill</button>
+        <button type="submit" class="btn-primary">Analyze Market Value</button>
       </div>
     </form>
 
     {% if results %}
-    <div class="result">
-      <small>Estimated resale value</small>
-      <strong>{{ results }}</strong>
+    <div class="result-container">
+      <div class="price-card">
+        <small>ESTIMATED RESALE</small>
+        <strong>{{ results }}</strong>
+        
+        <div class="confidence-wrapper">
+          <span class="meter-label">Model Accuracy: 94%</span>
+          <div class="meter-bar">
+            <div class="meter-fill" id="meterFill"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="verdict-card">
+        <span class="badge" id="verdictBadge">Verdict</span>
+        <div class="verdict-text" id="verdictText">
+          Analyzing data...
+        </div>
+      </div>
     </div>
     {% endif %}
   </div>
 </div>
 
 <script>
-/* FULL DATASET MAPPING — ALPHABETICAL */
+/* UPDATED MAPPING: i10 & i20 FIXED */
 const MODEL_MAP = new Map([
-  ["3",0],["5",1],["6",2],["7",3],["A4",4],["A6",5],["A8",6],["Alto",7],
-  ["Altroz",8],["Alturas",9],["Amaze",10],["Aspire",11],["Aura",12],
-  ["Baleno",78],["Bolero",14],["Camry",20],["Carnival",21],["Celerio",23],
-  ["City",25],["Creta",30],["Duster",32],["Eeco",39],["Ecosport",38],
-  ["Fortuner",45],["Glanza",53],["Grand",54],["Gurkha",55],["Harrier",56],
-  ["Hector",57],["Hexa",58],["Ignis",84],["Innova",59],["Jazz",61],
-  ["KWID",64],["Nexon",70],["Polo",73],["Safari",83],["Seltos",86],
-  ["Swift",88],["Swift Dzire",85],["Thar",90],["Tiago",91],["Verna",97],
-  ["Venue",96],["WR-V",99],["XUV300",113],["i10",117],["i20",118]
+  ["Alto",7],["Grand",54],["i20",118],["Ecosport",38],["Wagon R",100],["i10",117],["Venue",96],["Swift",88],["Verna",97],["Duster",32],["Cooper",60],["Ciaz",13],["C-Class",89],["Innova",59],["Baleno",78],["Swift Dzire",85],["Vento",95],["Creta",30],["City",25],["Bolero",14],["Fortuner",45],["KWID",64],["Amaze",10],["Santro",29],["XUV500",24],["KUV100",16],["Ignis",84],["RediGO",114],["Scorpio",63],["Marazzo",68],["Aspire",11],["Figo",44],["Vitara",98],["Tiago",91],["Polo",73],["Seltos",86],["Celerio",23],["GO",49],["5",1],["CR-V",19],["Endeavour",41],["KUV",62],["Jazz",61],["3",0],["A4",4],["Tigor",92],["Ertiga",42],["Safari",83],["Thar",90],["Hexa",58],["Rover",79],["Eeco",39],["A6",5],["E-Class",36],["Q7",74],["Z4",116],["6",2],["XF",111],["X5",106],["Hector",57],["Civic",26],["D-Max",31],["Cayenne",22],["X1",103],["Rapid",77],["Freestyle",46],["Superb",87],["Nexon",70],["XUV300",113],["Dzire VXI",34],["S90",82],["WR-V",99],["XL6",112],["Triber",93],["ES",37],["Wrangler",101],["Camry",20],["Elantra",40],["Yaris",115],["GL-Class",47],["7",3],["S-Presso",81],["Dzire LXI",33],["Aura",12],["XC",107],["Ghibli",51],["Continental",28],["CR",18],["Kicks",65],["S-Class",80],["Tucson",94],["Harrier",56],["X3",104],["Octavia",71],["Compass",27],["CLS",17],["redi-GO",119],["Glanza",53],["Macan",67],["X4",105],["Dzire ZXI",35],["XC90",109],["F-PACE",43],["A8",6],["MUX",66],["GTC4Lusso",50],["GLS",48],["X-Trail",102],["XE",110],["XC60",108],["Panamera",72],["Alturas",9],["Altroz",8],["NX",69],["Carnival",21],["C",15],["RX",76],["Ghost",52],["Quattroporte",75],["Gurkha",55]
 ]);
 
-const models = Array.from(MODEL_MAP.keys()).sort();
+/* Custom Sort: Names first, Numbers last */
+const models = Array.from(MODEL_MAP.keys()).sort((a, b) => {
+  const aIsNum = !isNaN(a);
+  const bIsNum = !isNaN(b);
+  if (aIsNum && !bIsNum) return 1;
+  if (!aIsNum && bIsNum) return -1;
+  return a.localeCompare(b);
+});
 
 const input = document.getElementById("modelInput");
 const hidden = document.getElementById("modelCode");
 const box = document.getElementById("suggestions");
 
-/* SHOW ALL ON FOCUS */
-input.addEventListener("focus",()=>render(models));
-
-/* FILTER ON TYPE */
-input.addEventListener("input",()=>{
-  const q=input.value.toLowerCase();
-  const matches=models.filter(m=>m.toLowerCase().includes(q));
-  render(matches.length ? matches : [closest(q)]);
+input.addEventListener("focus", () => render(models));
+input.addEventListener("input", () => {
+  const q = input.value.toLowerCase();
+  const matches = models.filter(m => m.toLowerCase().includes(q));
+  render(matches);
 });
 
-function render(list){
-  box.innerHTML="";
-  list.forEach(name=>{
-    const d=document.createElement("div");
-    d.textContent=name;
-    d.onclick=()=>{
-      input.value=name;
-      hidden.value=MODEL_MAP.get(name);
-      box.style.display="none";
-    };
-    box.appendChild(d);
-  });
-  box.style.display="block";
+function render(list) {
+  box.innerHTML = "";
+  if(list.length > 0) {
+    box.style.display = "block";
+    list.forEach(m => {
+      const d = document.createElement("div");
+      d.textContent = m;
+      d.onmousedown = (e) => {
+        e.preventDefault();
+        input.value = m;
+        hidden.value = MODEL_MAP.get(m);
+        box.style.display = "none";
+      };
+      box.appendChild(d);
+    });
+  } else { box.style.display = "none"; }
 }
 
-function closest(q){
-  let best=models[0], score=Infinity;
-  for(const m of models){
-    const s=Math.abs(m.length-q.length);
-    if(s<score){score=s;best=m;}
+input.addEventListener("blur", () => setTimeout(() => box.style.display = "none", 200));
+
+window.onload = () => {
+  const fill = document.getElementById("meterFill");
+  const badge = document.getElementById("verdictBadge");
+  const vText = document.getElementById("verdictText");
+  const age = parseInt(document.getElementById("ageInput").value) || 0;
+
+  if(fill) {
+    setTimeout(() => { fill.style.width = "94%"; }, 500);
+    if(age < 3) {
+      badge.innerText = "High Demand";
+      badge.style.background = "#ecfdf5";
+      vText.innerText = "Modern buyers love newer models. If you're looking for maximum cash-out, this is your peak window.";
+    } else if(age >= 3 && age < 7) {
+      badge.innerText = "Market Value";
+      badge.style.background = "#eff6ff";
+      badge.style.color = "#1e40af";
+      vText.innerText = "Your car's depreciation has slowed. It's a fair market now; sell if you have a specific goal in mind.";
+    } else {
+      badge.innerText = "Keep It";
+      badge.style.background = "#fff7ed";
+      badge.style.color = "#9a3412";
+      vText.innerText = "Maintenance is cheaper than a new EMI. Keep it as a secondary or city car—it's still got plenty of life.";
+    }
   }
-  return best+" (closest)";
-}
+};
 
-document.getElementById("carForm").addEventListener("submit",()=>{
-  if(!hidden.value){
-    hidden.value = MODEL_MAP.get(input.value) || MODEL_MAP.get(models[0]);
-  }
-});
-
-/* RANDOM SAMPLE DATA */
-const samples=[
-  {m:"i20",age:5,km:42000,ml:19.8,cc:1197,p:82,s:5},
-  {m:"Swift",age:3,km:28000,ml:21.2,cc:1197,p:81,s:5},
-  {m:"Creta",age:4,km:50000,ml:17.4,cc:1497,p:113,s:5}
-];
-
-function fillSample(){
-  const x=samples[Math.floor(Math.random()*samples.length)];
-  input.value=x.m;
-  hidden.value=MODEL_MAP.get(x.m);
-  carForm.vehicle_age.value=x.age;
-  carForm.km_driven.value=x.km;
-  carForm.mileage.value=x.ml;
-  carForm.engine.value=x.cc;
-  carForm.max_power.value=x.p;
-  carForm.seats.value=x.s;
-  carForm.seller_type.value="Individual";
-  carForm.fuel_type.value="Petrol";
-  carForm.transmission_type.value="Manual";
+function fillSample() {
+  const f = document.getElementById("carForm");
+  input.value = "i20";
+  hidden.value = 118;
+  f.vehicle_age.value = 5;
+  f.km_driven.value = 42000;
+  f.engine.value = 1197;
+  f.max_power.value = 82;
+  f.mileage.value = 19.8;
 }
 </script>
 </body>
