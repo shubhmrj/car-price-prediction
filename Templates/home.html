@@ -1,257 +1,238 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Car Price Estimator</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Car Price Estimator</title>
 
-<!-- Single clean font -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">
+  <!-- Google Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&display=swap" rel="stylesheet"/>
 
-<style>
-:root{
-  --bg:#f5f6f4;
-  --card:#ffffff;
-  --text:#1f2933;
-  --muted:#6b7280;
-  --accent:#b91c1c; /* car red */
-  --border:#e5e7eb;
-}
+  <style>
+    :root{
+      --bg:#f5f6f4;
+      --card:#ffffff;
+      --text:#1f2933;
+      --muted:#6b7280;
+      --accent:#b91c1c;
+      --border:#e5e7eb;
+    }
 
-*{box-sizing:border-box}
+    *{ box-sizing:border-box; }
 
-body{
-  margin:0;
-  font-family:'Manrope',sans-serif;
-  background:var(--bg);
-  color:var(--text);
-  min-height:100vh;
-  padding:20px;
-  position:relative;
-}
+    body{
+      margin:0;
+      font-family:Manrope,sans-serif;
+      background:
+        linear-gradient(to bottom, rgba(245,246,244,.94), rgba(245,246,244,.98)),
+        url("https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=1600&auto=format&fit=crop");
+      background-size:cover;
+      background-position:center;
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:16px;
+    }
 
-/* Subtle car background */
-body::after{
-  content:"";
-  position:fixed;
-  inset:0;
-  background:url("https://images.unsplash.com/photo-1542362567-b07e54358753?q=80&w=1600&auto=format&fit=crop");
-  background-size:cover;
-  background-position:right center;
-  opacity:0.08;
-  pointer-events:none;
-}
+    .wrapper{
+      width:100%;
+      max-width:920px;
+    }
 
-.wrapper{
-  max-width:880px;
-  margin:auto;
-  position:relative;
-  z-index:1;
-}
+    .header{
+      margin-bottom:24px;
+    }
 
-.header{
-  margin-bottom:26px;
-}
+    .header h1{
+      margin:0;
+      font-size:1.9rem;
+      font-weight:600;
+    }
 
-.header h1{
-  margin:0;
-  font-size:1.9rem;
-  font-weight:600;
-}
+    .header p{
+      margin-top:6px;
+      color:var(--muted);
+      max-width:560px;
+    }
 
-.header p{
-  margin-top:6px;
-  color:var(--muted);
-  max-width:560px;
-}
+    .card{
+      background:var(--card);
+      border-radius:18px;
+      padding:28px;
+      border:1px solid var(--border);
+      box-shadow:0 25px 50px rgba(0,0,0,.12);
+    }
 
-.card{
-  background:var(--card);
-  border:1px solid var(--border);
-  border-radius:18px;
-  padding:30px;
-  box-shadow:0 25px 50px rgba(0,0,0,.1);
-}
+    label{
+      font-size:.75rem;
+      color:var(--muted);
+      margin-bottom:4px;
+      display:block;
+    }
 
-.section{
-  margin-bottom:28px;
-}
+    input, select{
+      width:100%;
+      padding:13px 14px;
+      border-radius:12px;
+      border:1px solid var(--border);
+      font-size:.95rem;
+    }
 
-.section-title{
-  font-size:.8rem;
-  font-weight:600;
-  letter-spacing:.08em;
-  color:var(--muted);
-  margin-bottom:14px;
-}
+    .section{ margin-bottom:26px; }
 
-.fields{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-  gap:16px;
-}
+    .section-title{
+      font-size:.75rem;
+      letter-spacing:.08em;
+      color:var(--muted);
+      margin-bottom:12px;
+      font-weight:600;
+    }
 
-label{
-  display:block;
-  font-size:.75rem;
-  color:var(--muted);
-  margin-bottom:5px;
-}
+    .fields{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+      gap:16px;
+    }
 
-input,select{
-  width:100%;
-  padding:13px 14px;
-  font-size:.95rem;
-  border-radius:12px;
-  border:1px solid var(--border);
-  background:#fff;
-  transition:border .15s ease, box-shadow .15s ease;
-}
+    /* ---------- AUTOCOMPLETE ---------- */
+    .autocomplete{ position:relative; }
 
-input:focus,select:focus{
-  outline:none;
-  border-color:var(--accent);
-  box-shadow:0 0 0 3px rgba(185,28,28,.12);
-}
+    .suggestions{
+      position:absolute;
+      top:100%;
+      left:0;
+      right:0;
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius:12px;
+      max-height:240px;
+      overflow-y:auto;
+      z-index:50;
+      display:none;
+    }
 
-.actions{
-  display:flex;
-  gap:14px;
-  flex-wrap:wrap;
-  margin-top:10px;
-}
+    .suggestions div{
+      padding:10px 14px;
+      cursor:pointer;
+    }
 
-button{
-  padding:14px 20px;
-  border-radius:14px;
-  border:none;
-  font-weight:600;
-  cursor:pointer;
-  transition:transform .12s ease, box-shadow .12s ease;
-}
+    .suggestions div:hover{
+      background:#f3f4f6;
+    }
 
-button:active{
-  transform:scale(.97);
-}
+    .hint{
+      font-size:.7rem;
+      color:var(--muted);
+      margin-top:6px;
+    }
 
-.btn-primary{
-  background:var(--accent);
-  color:#fff;
-  box-shadow:0 12px 25px rgba(185,28,28,.35);
-}
+    .actions{
+      display:flex;
+      gap:14px;
+      flex-wrap:wrap;
+      margin-top:10px;
+    }
 
-.btn-secondary{
-  background:#f3f4f6;
-  color:#111827;
-}
+    button{
+      padding:14px 20px;
+      border-radius:14px;
+      border:none;
+      font-weight:600;
+      cursor:pointer;
+    }
 
-/* Result animation */
-.result{
-  margin-top:28px;
-  padding:24px;
-  border-radius:16px;
-  border:1px solid var(--border);
-  background:#fafafa;
-  opacity:0;
-  transform:translateY(14px);
-  animation:reveal .5s ease forwards;
-}
+    .btn-primary{
+      background:var(--accent);
+      color:#fff;
+    }
 
-.result small{
-  color:var(--muted);
-}
+    .btn-secondary{
+      background:#f3f4f6;
+    }
 
-.result strong{
-  display:block;
-  margin-top:6px;
-  font-size:2.3rem;
-  font-weight:600;
-  letter-spacing:-.02em;
-}
+    .result{
+      margin-top:24px;
+      padding:20px;
+      border-radius:14px;
+      background:#fafafa;
+      border:1px solid var(--border);
+      animation:fadeUp .45s ease forwards;
+    }
 
-@keyframes reveal{
-  to{opacity:1;transform:none}
-}
+    .result strong{
+      display:block;
+      font-size:2.2rem;
+      margin-top:6px;
+    }
 
-/* Mobile polish */
-@media(max-width:520px){
-  .card{padding:24px}
-  .header h1{font-size:1.6rem}
-}
-</style>
+    @keyframes fadeUp{
+      from{opacity:0;transform:translateY(14px)}
+      to{opacity:1;transform:none}
+    }
+
+    @media(max-width:520px){
+      .card{padding:22px}
+      .header h1{font-size:1.6rem}
+    }
+  </style>
 </head>
 
 <body>
 <div class="wrapper">
-
   <div class="header">
     <h1>Car Price Estimator</h1>
-    <p>Estimate your car’s resale value based on real usage, condition, and market patterns.</p>
+    <p>Estimate your car’s resale value using real usage and market patterns.</p>
   </div>
 
   <div class="card">
-    <form action="{{ url_for('predict_datapoint') }}" method="post" id="carForm">
+    <form method="post" action="{{ url_for('predict_datapoint') }}" id="carForm">
 
-      <!-- Vehicle details -->
       <div class="section">
         <div class="section-title">VEHICLE DETAILS</div>
         <div class="fields">
-          <div>
-            <label>Model Code (encoded)</label>
-            <input type="number" name="model" placeholder="e.g. 118" required>
+          <div class="autocomplete">
+            <label>Car Model</label>
+            <input id="modelInput" placeholder="Type or select car model" autocomplete="off" required>
+            <input type="hidden" name="model" id="modelCode">
+            <div id="suggestions" class="suggestions"></div>
+            <div class="hint">Scroll or type — nearest match auto-selected</div>
           </div>
         </div>
       </div>
 
-      <!-- Ownership -->
       <div class="section">
-        <div class="section-title">OWNERSHIP & SPECIFICATIONS</div>
         <div class="fields">
-          <div>
-            <label>Seller Type</label>
-            <select name="seller_type" required>
-              <option value="">Select</option>
-              <option>Individual</option>
-              <option>Dealer</option>
-              <option>Trustmark Dealer</option>
-            </select>
-          </div>
+          <select name="seller_type" required>
+            <option value="">Seller Type</option>
+            <option>Individual</option>
+            <option>Dealer</option>
+            <option>Trustmark Dealer</option>
+          </select>
 
-          <div>
-            <label>Fuel Type</label>
-            <select name="fuel_type" required>
-              <option value="">Select</option>
-              <option>Petrol</option>
-              <option>Diesel</option>
-              <option>CNG</option>
-              <option>LPG</option>
-              <option>Electric</option>
-            </select>
-          </div>
+          <select name="fuel_type" required>
+            <option value="">Fuel Type</option>
+            <option>Petrol</option>
+            <option>Diesel</option>
+            <option>CNG</option>
+            <option>LPG</option>
+            <option>Electric</option>
+          </select>
 
-          <div>
-            <label>Transmission</label>
-            <select name="transmission_type" required>
-              <option value="">Select</option>
-              <option>Manual</option>
-              <option>Automatic</option>
-            </select>
-          </div>
-        </div>
-      </div>
+          <select name="transmission_type" required>
+            <option value="">Transmission</option>
+            <option>Manual</option>
+            <option>Automatic</option>
+          </select>
 
-      <!-- Condition -->
-      <div class="section">
-        <div class="section-title">USAGE & CONDITION</div>
-        <div class="fields">
-          <div><label>Vehicle Age (years)</label><input type="number" name="vehicle_age" required></div>
-          <div><label>Kilometers Driven</label><input type="number" name="km_driven" required></div>
-          <div><label>Mileage (km/l)</label><input type="number" step="0.1" name="mileage" required></div>
-          <div><label>Engine (CC)</label><input type="number" name="engine" required></div>
-          <div><label>Max Power (bhp)</label><input type="number" step="0.1" name="max_power" required></div>
-          <div><label>Seats</label><input type="number" name="seats" required></div>
+          <input type="number" name="vehicle_age" placeholder="Vehicle Age" required>
+          <input type="number" name="km_driven" placeholder="KM Driven" required>
+          <input type="number" step="0.1" name="mileage" placeholder="Mileage" required>
+          <input type="number" name="engine" placeholder="Engine CC" required>
+          <input type="number" step="0.1" name="max_power" placeholder="Max Power" required>
+          <input type="number" name="seats" placeholder="Seats" required>
         </div>
       </div>
 
@@ -268,22 +249,88 @@ button:active{
     </div>
     {% endif %}
   </div>
-
 </div>
 
 <script>
+/* FULL DATASET MAPPING — ALPHABETICAL */
+const MODEL_MAP = new Map([
+  ["3",0],["5",1],["6",2],["7",3],["A4",4],["A6",5],["A8",6],["Alto",7],
+  ["Altroz",8],["Alturas",9],["Amaze",10],["Aspire",11],["Aura",12],
+  ["Baleno",78],["Bolero",14],["Camry",20],["Carnival",21],["Celerio",23],
+  ["City",25],["Creta",30],["Duster",32],["Eeco",39],["Ecosport",38],
+  ["Fortuner",45],["Glanza",53],["Grand",54],["Gurkha",55],["Harrier",56],
+  ["Hector",57],["Hexa",58],["Ignis",84],["Innova",59],["Jazz",61],
+  ["KWID",64],["Nexon",70],["Polo",73],["Safari",83],["Seltos",86],
+  ["Swift",88],["Swift Dzire",85],["Thar",90],["Tiago",91],["Verna",97],
+  ["Venue",96],["WR-V",99],["XUV300",113],["i10",117],["i20",118]
+]);
+
+const models = Array.from(MODEL_MAP.keys()).sort();
+
+const input = document.getElementById("modelInput");
+const hidden = document.getElementById("modelCode");
+const box = document.getElementById("suggestions");
+
+/* SHOW ALL ON FOCUS */
+input.addEventListener("focus",()=>render(models));
+
+/* FILTER ON TYPE */
+input.addEventListener("input",()=>{
+  const q=input.value.toLowerCase();
+  const matches=models.filter(m=>m.toLowerCase().includes(q));
+  render(matches.length ? matches : [closest(q)]);
+});
+
+function render(list){
+  box.innerHTML="";
+  list.forEach(name=>{
+    const d=document.createElement("div");
+    d.textContent=name;
+    d.onclick=()=>{
+      input.value=name;
+      hidden.value=MODEL_MAP.get(name);
+      box.style.display="none";
+    };
+    box.appendChild(d);
+  });
+  box.style.display="block";
+}
+
+function closest(q){
+  let best=models[0], score=Infinity;
+  for(const m of models){
+    const s=Math.abs(m.length-q.length);
+    if(s<score){score=s;best=m;}
+  }
+  return best+" (closest)";
+}
+
+document.getElementById("carForm").addEventListener("submit",()=>{
+  if(!hidden.value){
+    hidden.value = MODEL_MAP.get(input.value) || MODEL_MAP.get(models[0]);
+  }
+});
+
+/* RANDOM SAMPLE DATA */
+const samples=[
+  {m:"i20",age:5,km:42000,ml:19.8,cc:1197,p:82,s:5},
+  {m:"Swift",age:3,km:28000,ml:21.2,cc:1197,p:81,s:5},
+  {m:"Creta",age:4,km:50000,ml:17.4,cc:1497,p:113,s:5}
+];
+
 function fillSample(){
-  const f=document.forms.carForm;
-  f.model.value=118;
-  f.seller_type.value="Individual";
-  f.fuel_type.value="Petrol";
-  f.transmission_type.value="Manual";
-  f.vehicle_age.value=5;
-  f.km_driven.value=45000;
-  f.mileage.value=20.4;
-  f.engine.value=1197;
-  f.max_power.value=82;
-  f.seats.value=5;
+  const x=samples[Math.floor(Math.random()*samples.length)];
+  input.value=x.m;
+  hidden.value=MODEL_MAP.get(x.m);
+  carForm.vehicle_age.value=x.age;
+  carForm.km_driven.value=x.km;
+  carForm.mileage.value=x.ml;
+  carForm.engine.value=x.cc;
+  carForm.max_power.value=x.p;
+  carForm.seats.value=x.s;
+  carForm.seller_type.value="Individual";
+  carForm.fuel_type.value="Petrol";
+  carForm.transmission_type.value="Manual";
 }
 </script>
 </body>
